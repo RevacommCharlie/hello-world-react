@@ -117,7 +117,7 @@ jobs:
       #     ./scripts/github-action-announce-broken-branch
 
   e2e_tests:
-    needs: [ pre_deps, build_db_migrate_image, build_server_image ]
+    needs: [ pre_deps ]
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
