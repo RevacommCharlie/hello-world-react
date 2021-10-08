@@ -1,26 +1,17 @@
 ---
 repos:
-  - repo: git://github.com/igorshubovych/markdownlint-cli
-    rev: v0.27.1
-    hooks:
-      - id: markdownlint
-        entry: markdownlint --ignore docs/adr/index.md
-
-  - repo: git://github.com/detailyang/pre-commit-shell
-    rev: 1.0.5
-    hooks:
-      - id: shell-lint
-
   - repo: git://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
     hooks:
       - id: check-yaml
       - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
 
-  - repo: local
-    hooks:
-      - id: eslint
-        name: eslint
-        entry: scripts/pre-commit-eslint
-        language: script
-        files: \.(js|jsx|ts|tsx)$
+  # - repo: local
+  #   hooks:
+  #     - id: eslint
+  #       name: eslint
+  #       entry: scripts/pre-commit-eslint
+  #       language: script
+  #       files: \.(js|jsx|ts|tsx)$
