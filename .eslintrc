@@ -5,8 +5,7 @@
   },
   "extends": [
     "react-app",
-    "plugin:jsx-a11y/recommended",
-    "plugin:prettier/recommended"
+    "plugin:jsx-a11y/recommended"
   ],
   "plugins": ["cypress", "simple-import-sort"],
   "rules": {
