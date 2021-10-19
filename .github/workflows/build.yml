@@ -197,13 +197,15 @@ jobs:
       #   run: |
       #     ./scripts/github-action-announce-broken-branch
 
-  publish-image:
+  build-and-push-image:
     if: ${{ github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'deploy_dev') }}
     needs: [ lint, client_test, e2e_tests ]
     runs-on: ubuntu-latest
     environment: dev
     env:
       APP_ENV: dev
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
     permissions:
       packages: write
       contents: read
@@ -232,10 +234,28 @@ jobs:
             v1-yarn-
       - name: Build frontend code
         run: yarn run build
-      - name: Publish image
-        run: yarn publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      # - name: Publish image
+      #   run: yarn publish
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
   # deploy_dev:
   #   if: ${{ github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'deploy_dev') }}
