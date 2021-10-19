@@ -197,13 +197,16 @@ jobs:
       #   run: |
       #     ./scripts/github-action-announce-broken-branch
 
-  deploy_dev:
+  publish-image:
     if: ${{ github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'deploy_dev') }}
     needs: [ lint, client_test, e2e_tests ]
     runs-on: ubuntu-latest
     environment: dev
     env:
       APP_ENV: dev
+    permissions:
+      packages: write
+      contents: read
     steps:
       - name: Check out code
         uses: actions/checkout@v2.3.4
@@ -213,6 +216,7 @@ jobs:
         uses: actions/setup-node@v2.4.1
         with:
           node-version: ${{ env.HELLO_REACT_APP_NODE_VERSION }}
+          registry-url: http://npm.pkg.github.com/
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -226,6 +230,42 @@ jobs:
           key: v1-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             v1-yarn-
+      - name: Build frontend code
+        run: yarn run build
+      - name: Publish image
+        run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+  # deploy_dev:
+  #   if: ${{ github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'deploy_dev') }}
+  #   needs: [ lint, client_test, e2e_tests ]
+  #   runs-on: ubuntu-latest
+  #   environment: dev
+  #   env:
+  #     APP_ENV: dev
+  #   steps:
+  #     - name: Check out code
+  #       uses: actions/checkout@v2.3.4
+  #       with:
+  #         ref: ${{ github.event.pull_request.head.sha }}
+  #     - name: Set up node
+  #       uses: actions/setup-node@v2.4.1
+  #       with:
+  #         node-version: ${{ env.HELLO_REACT_APP_NODE_VERSION }}
+  #     - name: Get yarn cache directory path
+  #       id: yarn-cache-dir-path
+  #       run: echo "::set-output name=dir::$(yarn cache dir)"
+  #     - name: Configure yarn cache
+  #       uses: actions/cache@v2.1.6
+  #       id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+  #       with:
+  #         path: |
+  #           ${{ steps.yarn-cache-dir-path.outputs.dir }}
+  #           ./node_modules
+  #         key: v1-yarn-${{ hashFiles('**/yarn.lock') }}
+  #         restore-keys: |
+  #           v1-yarn-
       # - name: Configure AWS Credentials
       #   uses: aws-actions/configure-aws-credentials@0d9a5be0dceea74e09396820e1e522ba4a110d2f # v1.5.10
       #   with:
