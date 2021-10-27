@@ -11,6 +11,7 @@ runs:
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
+      shell: bash
     - name: Configure yarn cache
       uses: actions/cache@v2.1.6
       id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
@@ -22,5 +23,5 @@ runs:
         restore-keys: |
           v1-yarn-
     - name: Install yarn dependencies
-      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      # if: steps.yarn-cache.outputs.cache-hit != 'true'
       run: yarn install
