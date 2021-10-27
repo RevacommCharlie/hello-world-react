@@ -24,14 +24,7 @@ jobs:
     container:
       image: clamav/clamav:0.104.0
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2.3.4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - run: clamscan --version
-      - run: mkdir -p /store && chown clamav /store
-      - run: freshclam --config-file /etc/clamav/freshclam.conf --datadir=/store
-      - run: clamscan --recursive --infected --detect-pua=yes --max-scansize=300M --max-filesize=100M --max-recursion=30 --max-files=50000 --tempdir=/tmp --database=/store .
+      - uses: ./.github/actions/anti-virus-scan
       # - name: Announce failure
       #   if: ${{ failure() }}
       #   run: |
