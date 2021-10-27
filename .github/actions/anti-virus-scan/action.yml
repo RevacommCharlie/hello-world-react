@@ -1,7 +1,7 @@
 name: 'Anti-Virus Scan'
 description: 'Clam Anti-Virus Scan'
 runs:
-  using: 'bash'
+  using: 'composite'
 steps:
   - run: clamscan --version
   - run: mkdir -p /store && chown clamav /store
