@@ -3,10 +3,6 @@ description: 'Clam Anti-Virus Scan'
 runs:
   using: 'bash'
 steps:
-  - name: Check out code
-    uses: actions/checkout@v2.3.4
-    with:
-      ref: ${{ github.event.pull_request.head.sha }}
   - run: clamscan --version
   - run: mkdir -p /store && chown clamav /store
   - run: freshclam --config-file /etc/clamav/freshclam.conf --datadir=/store
