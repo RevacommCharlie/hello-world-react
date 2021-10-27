@@ -24,5 +24,9 @@ runs:
           v1-yarn-
     - name: Install yarn dependencies
       # if: steps.yarn-cache.outputs.cache-hit != 'true'
-      run: yarn install
       shell: bash
+      run: |
+        if echo ${{ steps.yarn-cache.outputs.cache-hit != 'true' }} | grep -c "true"
+        then
+          yarn install
+        fi
