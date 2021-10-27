@@ -39,6 +39,7 @@ jobs:
 
   pre_deps:
     runs-on: ubuntu-latest
+    needs: [ anti_virus ]
     steps:
       - name: Check out code
         uses: actions/checkout@v2.3.4
@@ -62,6 +63,7 @@ jobs:
           restore-keys: |
             v1-yarn-
       - name: Install yarn dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
       # - name: Announce failure
       #   if: ${{ failure() }}

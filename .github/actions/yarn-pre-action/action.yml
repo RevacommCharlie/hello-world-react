@@ -1,0 +1,8 @@
+name: 'Yarn Pre-dependencies'
+description: 'Pre-dependency actions for yarn build'
+inputs:
+  node-version:
+    description: 'Version of node to run' 
+    required: true
+    default: '16.8.0'
+outputs:
