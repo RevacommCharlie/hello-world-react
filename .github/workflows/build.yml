@@ -49,6 +49,10 @@ jobs:
         uses: actions/setup-node@v2.4.1
         with:
           node-version: ${{ env.HELLO_REACT_APP_NODE_VERSION }}
+      - id: yarn-cache
+        uses: ./.github/actions/yarn-get-cache
+        with:
+          node-version: ${{ env.HELLO_REACT_APP_NODE_VERSION }}
 
       # - name: Announce failure
       #   if: ${{ failure() }}
@@ -67,28 +71,23 @@ jobs:
         uses: actions/setup-node@v2.4.1
         with:
           node-version: ${{ env.HELLO_REACT_APP_NODE_VERSION }}
-      - id: yarn-cache
-        uses: actions/yarn-get-cache@v1
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Configure yarn cache
+        uses: actions/cache@v2.1.6
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
         with:
-          node-version: ${{ env.HELLO_REACT_APP_NODE_VERSION }}
-      # - name: Get yarn cache directory path
-      #   id: yarn-cache-dir-path
-      #   run: echo "::set-output name=dir::$(yarn cache dir)"
-      # - name: Configure yarn cache
-      #   uses: actions/cache@v2.1.6
-      #   id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-      #   with:
-      #     path: |
-      #       ${{ steps.yarn-cache-dir-path.outputs.dir }}
-      #       ./node_modules
-      #     key: v1-yarn-${{ hashFiles('**/yarn.lock') }}
-      #     restore-keys: |
-      #       v1-yarn-
-      # - name: Pre-commit checks
-      #   uses: pre-commit/action@v2.0.3
-      #   with:
-      #     extra_args: --all-files
-
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            ./node_modules
+          key: v1-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            v1-yarn-
+      - name: Pre-commit checks
+        uses: pre-commit/action@v2.0.3
+        with:
+          extra_args: --all-files
       # - name: Announce failure
       #   if: ${{ failure() }}
       #   run: |
