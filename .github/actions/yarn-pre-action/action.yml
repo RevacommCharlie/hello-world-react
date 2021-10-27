@@ -5,4 +5,3 @@ inputs:
     description: 'Version of node to run' 
     required: true
     default: '16.8.0'
-outputs:

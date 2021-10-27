@@ -1,0 +1,26 @@
+name: 'Yarn Get Cache'
+description: 'Get yarn cache or create if no cache'
+inputs:
+  node-version:
+    description: 'Version of node to run' 
+    required: true
+    default: '16.8.0'
+runs:
+  using: "composite"
+  steps:
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+    - name: Configure yarn cache
+      uses: actions/cache@v2.1.6
+      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      with:
+        path: |
+          ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          ./node_modules
+        key: v1-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          v1-yarn-
+    - name: Install yarn dependencies
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      run: yarn install
